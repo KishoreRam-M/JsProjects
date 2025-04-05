@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Modern Weather App</title>
+    
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <style>
+        body {
+            background: #0a0a0a;
+            font-family: 'Poppins', sans-serif;
+            color: #fff;
+            text-align: center;
+        }
+        
+        /* Modern Heading */
+        .heading {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #F0F8FF; /* Alice Blue */
+            text-shadow: 0 0 20px rgba(0, 255, 255, 0.8);
+            margin-bottom: 20px;
+            letter-spacing: 1.5px;
+        }
+
+        .card {
+            background: rgba(20, 20, 20, 0.95);
+            border: 2px solid #2c2c2c;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+            transition: all 0.3s ease-in-out;
+        }
+
+        .card:hover {
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.8);
+        }
+
+        .search input {
+            background: #1a1a1a;
+            border: 1px solid #00d9ff;
+            color: #fff;
+            transition: all 0.3s;
+        }
+
+        .search input:focus {
+            box-shadow: 0 0 10px #00d9ff;
+            outline: none;
+        }
+
+        .btn-primary {
+            background: #00d9ff;
+            border: none;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .btn-primary:hover {
+            background: #0099cc;
+            box-shadow: 0 0 15px #00d9ff;
+            transform: scale(1.05);
+        }
+
+        .weather {
+            opacity: 0;
+            transition: opacity 0.8s ease-in-out, transform 0.8s ease-in-out;
+            transform: scale(0.9);
+        }
+
+        .weather.show {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .weather-icon {
+            filter: drop-shadow(0 0 10px rgba(0, 255, 255, 0.8));
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .details img {
+            width: 40px;
+            filter: drop-shadow(0 0 10px rgba(0, 255, 255, 0.8));
+        }
+
+        .details p {
+            transition: all 0.3s ease-in-out;
+        }
+
+        .details p:hover {
+            color: #00d9ff;
+            text-shadow: 0 0 10px #00d9ff;
+        }
+        
+        .temp, .city, .humidity, .wind {
+            color: #F0F8FF !important; 
+            text-shadow: 0 0 15px rgba(0, 255, 255, 0.8);
+        }
+    </style>
+</head>
+<body class="">
+
+    <div class="container d-flex flex-column justify-content-center align-items-center vh-100">
+        <h1 class="heading">My  Weather App</h1>
+
+        <div class="card shadow-lg p-4 text-center" style="max-width: 400px;">
+            <div class="search d-flex">
+                <input type="text" class="form-control me-2" placeholder="Enter the City name" spellcheck="false">
+                <button id="btn" class="btn btn-primary">
+                    <img src="images/search.png" alt="Search" style="width: 20px;">
+                </button>
+            </div>
+
+            <div class="weather mt-4">
+                <img src="images/rain.png" alt="Weather Icon" class="weather-icon img-fluid">
+                <h1 class="temp display-4 fw-bold mt-2">--°C</h1>
+                <h2 class="city h4 text-muted">City</h2>
+
+                <div class="details d-flex justify-content-between mt-3">
+                    <div class="col text-center">
+                        <img src="images/humidity.png" alt="Humidity">
+                        <div>
+                            <p class="humidity fw-bold">--%</p>
+                            <p class="small text-muted">Humidity</p>
+                        </div>
+                    </div>
+                    <div class="col text-center">
+                        <img src="images/wind.png" alt="Wind Speed">
+                        <div>
+                            <p class="wind fw-bold">-- km/h</p>
+                            <p class="small text-muted">Wind Speed</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+    const apikey = "2ad1a4a410c970348dbd3e15637b8734";
+
+    const weatherContainer = document.querySelector(".weather");
+    const weatherIcon = document.querySelector(".weather-icon");
+
+    function updateWeatherIcon(weather) {
+        const icons = {
+            "Clear": "images/clear.png",
+            "Clouds": "images/clouds.png",
+            "Drizzle": "images/drizzle.png",
+            "Rain": "images/rain.png",
+            "Snow": "images/snow.png",
+            "Thunderstorm": "images/thunderstorm.png",
+        };
+        weatherIcon.src = icons[weather] || "images/default.png";
+    }
+
+    async function checkWeather(city) {
+        const apiurl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&lang=en&appid=${apikey}`;
+
+        try {
+            const response = await fetch(apiurl);
+            if (!response.ok) {
+                throw new Error("City not found");
+            }
+
+            const data = await response.json();
+            console.log(data);
+
+            weatherContainer.classList.remove("show");
+
+            setTimeout(() => {
+                document.querySelector(".city").innerHTML = data.name;
+                document.querySelector(".temp").innerHTML = `${Math.round(data.main.temp)}°C`;
+                document.querySelector(".humidity").innerHTML = `${data.main.humidity}%`;
+                document.querySelector(".wind").innerHTML = `${(data.wind.speed * 3.6).toFixed(1)} km/h`;
+
+                updateWeatherIcon(data.weather[0].main);
+
+                weatherContainer.classList.add("show");
+            }, 300);
+
+        } catch (error) {
+            alert(error.message);
+        }
+    }
+
+    document.querySelector("#btn").addEventListener("click", function () {
+        const city = document.querySelector(".search input").value.trim();
+        if (city) {
+            checkWeather(city);
+        } else {
+            alert("Please enter a city name.");
+        }
+    });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
