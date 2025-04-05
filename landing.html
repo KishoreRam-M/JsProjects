@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Byte & Chew - Restaurant</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@300;400;600&family=Rajdhani:wght@400;700&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: "Poppins", sans-serif;
+      background: url("pexels.jpg") no-repeat center center/cover;
+      color: white;
+      text-align: center;
+    }
+
+    /* Navbar */
+    .navbar {
+      background: rgba(0, 0, 0, 0.8);
+    }
+
+    .navbar-brand {
+      font-size: 2rem;
+      font-weight: bold;
+      color: gold !important;
+      text-shadow: 0 0 10px gold;
+    }
+
+    .nav-link {
+      font-size: 1.2rem;
+      color: white !important;
+      cursor: pointer;
+    }
+
+    .nav-link:hover {
+      color: gold !important;
+      text-shadow: 0 0 10px gold;
+    }
+
+    /* Hero Section */
+    .hero {
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      text-align: center;
+      position: relative;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.3);
+      z-index: -1;
+    }
+
+    .tagline {
+      font-size: 1.8rem;
+      color: gold;
+      font-weight: bold;
+    }
+
+    .btn-custom {
+      margin-top: 20px;
+      padding: 12px 20px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      background: gold;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease-in-out;
+    }
+
+    .btn-custom:hover {
+      background: orange;
+      box-shadow: 0 0 15px orange;
+      transform: scale(1.1);
+    }
+
+    /* Modals */
+    .modal-content {
+      background: rgba(0, 0, 0, 0.9);
+      border-radius: 10px;
+      color: white;
+    }
+
+    .modal-title {
+      color: gold;
+      text-shadow: 0 0 10px gold;
+    }
+
+    /* Menu Cards */
+    .menu-card {
+      background: rgba(255, 215, 0, 0.1);
+      border-radius: 10px;
+      padding: 15px;
+      transition: 0.3s;
+      cursor: pointer;
+    }
+
+    .menu-card:hover {
+      box-shadow: 0 0 15px gold;
+    }
+
+    /* Footer */
+    .footer {
+      background: rgba(0, 0, 0, 0.9);
+      padding: 15px;
+      color: gold;
+      font-size: 1rem;
+    }
+
+    /* Toast Notification */
+    .toast-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 1050;
+      background-color: #111; /* pure dark */
+
+    }
+
+    .toast {
+      background: rgba(0, 0, 0, 0.9);
+      background-color: #111; /* pure dark */
+
+      color: gold;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg">
+    <div class="container">
+      <a class="navbar-brand" href="#">Byte & Chew</a>
+      <div class="navbar-nav ms-auto">
+        <a class="nav-link" href="#">Home</a>
+        <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#locationModal">Location</a>
+        <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#menuModal">Menu</a>
+      </div>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <h1 class="tagline">Savor Every Byte, Deploy Every Flavor!</h1>
+    <p><span id="selected-location" class="h3">📍 Select Your Location </span></p>
+    <button class="btn btn-custom" data-bs-toggle="modal" data-bs-target="#locationModal">Select Location</button>
+    <button class="btn btn-custom" id="deployBtn" data-bs-toggle="modal" data-bs-target="#menuModal" disabled>Deploy Meal</button>
+  </section>
+
+  <div class="modal fade" id="locationModal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-body">
+          <select class="form-select" id="locationSelect">
+            <option value="Kadayanallur">Kadayanallur</option>
+            <option value="Tenkasi">Tenkasi</option>
+            <option value="Surandai">Surandai</option>
+            <option value="Sankarankovil">Sankarankovil</option>
+          </select>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-custom" onclick="setLocation()" data-bs-dismiss="modal">Confirm</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="menuModal">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-body">
+          <div class="row" id="menuList"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container">
+    <div id="mealToast" class="toast" role="alert">
+      <div class="toast-header">
+        <strong class="me-auto ">Meal Deployed 🚀</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+      </div>
+      <div class="toast-body" id="toastBody"></div>
+    </div>
+  </div>
+
+  <footer class="footer">© 2025 Byte & Chew. All rights reserved.</footer>
+
+  <script>
+    const menuItems = [
+      { name: "Burger 🍔", price: "₹400" },
+      { name: "Pizza 🍕", price: "₹640" },
+      { name: "Pasta 🍝", price: "₹560" },
+      { name: "Biryani 🍛", price: "₹800" },
+      { name: "Fish Curry 🐟", price: "₹480" },
+      { name: "Tandoori Chicken 🍗", price: "₹750" }
+    ];
+
+    function setLocation() {
+      const location = document.getElementById("locationSelect").value;
+      document.getElementById("selected-location").textContent = `📍 ${location}`;
+      document.getElementById("deployBtn").disabled = false;
+    }
+
+    function loadMenu() {
+      const menuList = document.getElementById("menuList");
+      menuList.innerHTML = "";
+      menuItems.forEach((item) => {
+        const div = document.createElement("div");
+        div.className = "col-md-4 menu-card";
+        div.innerHTML = `<h4>${item.name}</h4><p>${item.price}</p>`;
+        div.onclick = () => deployMeal(item.name);
+        menuList.appendChild(div);
+      });
+    }
+
+    function deployMeal(meal) {
+      document.getElementById("toastBody").textContent = `Your ${meal} is successfully deployed! 🎉`;
+      let mealToast = new bootstrap.Toast(document.getElementById("mealToast"));
+      mealToast.show();
+    }
+
+    document.getElementById("menuModal").addEventListener("show.bs.modal", loadMenu);
+  </script>
+</body>
+</html>
